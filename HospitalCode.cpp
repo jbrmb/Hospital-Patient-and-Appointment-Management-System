@@ -9,34 +9,81 @@ private:
     int id;
     string name;
     int age;
+    string phoneNumber;
+    string address;
     string diagnosis;
     double billBalance;
 
 public:
-    // Constructor
-    Patient(int pId, string pName, int pAge, string pDiag, double pBalance) {
-        if (pId <= 0 || pAge < 0) {
-            throw invalid_argument("Invalid ID or age entered for patient");
+    // Constructor with input validation throwing standard exceptions
+    Patient(int pId, string pName, int pAge, string pPhone, string pAddr, string pDiag, double pBalance) {
+        if (pId <= 0 || pAge < 0 || pAge > 120) {
+            throw invalid_argument("Error: Patient ID must be positive and age must be between 0 and 120.");
         }
+        
         id = pId;
         name = pName;
         age = pAge;
+        phoneNumber = pPhone;
+        address = pAddr;
         diagnosis = pDiag;
         billBalance = pBalance;
     }
 
-// function to display patient details
-    void display() {
-        cout << "Patient ID: " << id << endl;
-        cout << "Name: " << name << endl;
-        cout << "Age: " << age << endl;
-        cout << "Diagnosis: " << diagnosis << endl;
-        cout << "Bill Balance: $" << billBalance << endl;
-        cout << "--" << endl;
+    // Member function to display complete patient details
+    void displayPatientDetails() {
+        cout << "\n";
+        cout << "PATIENT RECORD CARD\n";
+        cout << "\n";
+        cout << " Patient ID   : " << id << endl;
+        cout << " Full Name    : " << name << endl;
+        cout << " Age          : " << age << " years old" << endl;
+        cout << " Phone Number : " << phoneNumber << endl;
+        cout << " Home Address : " << address << endl;
+        cout << " Diagnosis    : " << diagnosis << endl;
+        cout << " Bill Balance : $" << billBalance << endl;
+        cout << "\n";
     }
 
+    // Getter functions
     int getId() {
         return id;
+    }
+
+    string getName() {
+        return name;
+    }
+
+    int getAge() {
+        return age;
+    }
+
+    string getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    string getAddress() {
+        return address;
+    }
+
+    string getDiagnosis() {
+        return diagnosis;
+    }
+
+    double getBillBalance() {
+        return billBalance;
+    }
+
+    // Setter and updater functions
+    void setDiagnosis(string newDiag) {
+        diagnosis = newDiag;
+    }
+
+    void updateBillBalance(double amount) {
+        billBalance += amount;
+        if (billBalance < 0.0) {
+            billBalance = 0.0;
+        }
     }
 };
 
