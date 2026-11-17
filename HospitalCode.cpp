@@ -4,6 +4,7 @@
 
 using namespace std;
 
+
 class Patient {
 private:
     int id;
@@ -154,6 +155,7 @@ public:
     }
 };
 
+
 class Appointment {
 private:
     int appointmentId;
@@ -221,6 +223,7 @@ public:
         consultationStatus = status;
     }
 };
+
 
 class HospitalSystem {
 private:
@@ -427,85 +430,161 @@ public:
 };
 
 int main() {
-    HospitalSystem system;
-    int choice = 0;
+    // Instantiate our core system controller
+    HospitalSystem hms;
+    int menuChoice = 0;
 
-    cout << "Welcome to the Hospital Management System\n";
+    cout << "\n";
+    cout << "HOSPITAL MANAGEMENT SYSTEM";
+    cout << "\n";
 
+    // Main interactive control loop
     do {
-        cout << "\nMenu:\n";
-        cout << "1. Add New Patient\n";
-        cout << "2. View All Patients\n";
-        cout << "3. View All Doctors\n";
-        cout << "4. Book Appointment\n";
-        cout << "5. View Appointments\n";
-        cout << "6. Exit\n";
-        cout << "Enter your choice: ";
+        cout << "\n\n";
+        cout << "MAIN MENU\n";
+        cout << "\n";
+        cout << " 1. Register New Patient                  \n";
+        cout << " 2. View All Patient Records              \n";
+        cout << " 3. Search Patient by ID                  \n";
+        cout << " 4. Update Patient Billing Balance        \n";
+        cout << " 5. View Doctor Staff Directory           \n";
+        cout << " 6. Register New Doctor                   \n";
+        cout << " 7. Schedule New Appointment              \n";
+        cout << " 8. View All Scheduled Appointments       \n";
+        cout << " 9. View Hospital System Statistics       \n";
+        cout << " 10. Exit Program                          \n";
+        cout << "\n";
+        cout << "Enter your selection (1-10): ";
 
-        // input check
-        if (!(cin >> choice)) {
-            cout << "Invalid input. Please enter a number.\n";
+        // validation check
+        if (!(cin >> menuChoice)) {
+            cout << "\nPlease enter a valid integer number.\n";
             cin.clear();
-            cin.ignore(1000, '\n');
+            cin.ignore(10000, '\n');
             continue;
         }
 
-        // exception handling
+        // Try-catch block to intercept
         try {
-            if (choice == 1) {
-                int id, age;
-                string name, diag;
-                double balance;
+            switch (menuChoice) {
+                case 1: {
+                    int id, age;
+                    string name, phone, address, diagnosis;
+                    double balance;
 
-                cout << "Enter Patient ID: ";
-                cin >> id;
-                cout << "Enter Name: ";
-                cin >> name;
-                cout << "Enter Age: ";
-                cin >> age;
-                cout << "Enter Diagnosis: ";
-                cin >> diag;
-                cout << "Enter Balance Due: ";
-                cin >> balance;
+                    cout << "\nREGISTER NEW PATIENT\n";
+                    cout << "Enter Patient ID (Integer): ";
+                    cin >> id;
+                    cout << "Enter Full Name: ";
+                    cin.ignore();
+                    getline(cin, name);
+                    cout << "Enter Age: ";
+                    cin >> age;
+                    cout << "Enter Phone Number: ";
+                    cin.ignore();
+                    getline(cin, phone);
+                    cout << "Enter Home Address: ";
+                    getline(cin, address);
+                    cout << "Enter Initial Diagnosis: ";
+                    getline(cin, diagnosis);
+                    cout << "Enter Initial Bill Balance ($): ";
+                    cin >> balance;
 
-                system.addPatient(id, name, age, diag, balance);
-            }
-            else if (choice == 2) {
-                system.listPatients();
-            }
-            else if (choice == 3) {
-                system.listDoctors();
-            }
-            else if (choice == 4) {
-                int aId, pId, dId;
-                string date;
+                    hms.registerNewPatient(id, name, age, phone, address, diagnosis, balance);
+                    break;
+                }
+                case 2: {
+                    hms.displayAllPatients();
+                    break;
+                }
+                case 3: {
+                    int searchId;
+                    cout << "\nSEARCH PATIENT\n";
+                    cout << "Enter Patient ID to locate: ";
+                    cin >> searchId;
+                    hms.searchPatientById(searchId);
+                    break;
+                }
+                case 4: {
+                    int targetId;
+                    double amount;
+                    cout << "\nUPDATE PATIENT BILLING\n";
+                    cout << "Enter Patient ID: ";
+                    cin >> targetId;
+                    cout << "Enter Amount to Add/Subtract (use negative for payments): ";
+                    cin >> amount;
+                    hms.updatePatientBilling(targetId, amount);
+                    break;
+                }
+                case 5: {
+                    hms.displayAllDoctors();
+                    break;
+                }
+                case 6: {
+                    int id, experience;
+                    string name, specialization, officeRoom;
 
-                cout << "Enter Appointment ID: ";
-                cin >> aId;
-                cout << "Enter Patient ID: ";
-                cin >> pId;
-                cout << "Enter Doctor ID: ";
-                cin >> dId;
-                cout << "Enter Date (MM/DD/YYYY): ";
-                cin >> date;
+                    cout << "\nREGISTER NEW DOCTOR\n";
+                    cout << "Enter Doctor ID (Integer): ";
+                    cin >> id;
+                    cout << "Enter Doctor Last Name: ";
+                    cin.ignore();
+                    getline(cin, name);
+                    cout << "Enter Specialization (e.g., Pediatrics): ";
+                    getline(cin, specialization);
+                    cout << "Enter Office Room (e.g., Suite 204): ";
+                    getline(cin, officeRoom);
+                    cout << "Enter Years of Experience: ";
+                    cin >> experience;
 
-                system.bookAppointment(aId, pId, dId, date);
-            }
-            else if (choice == 5) {
-                system.listAppointments();
-            }
-            else if (choice == 6) {
-                cout << "Exiting program.\n";
-            }
-            else {
-                cout << "Invalid choice. Please select between 1 and 6.\n";
+                    hms.registerNewDoctor(id, name, specialization, officeRoom, experience);
+                    break;
+                }
+                case 7: {
+                    int apptId, patId, docId;
+                    string date, timeSlot;
+
+                    cout << "\nSCHEDULE APPOINTMENT\n";
+                    cout << "Enter Appointment ID: ";
+                    cin >> apptId;
+                    cout << "Enter Patient ID: ";
+                    cin >> patId;
+                    cout << "Enter Doctor ID: ";
+                    cin >> docId;
+                    cout << "Enter Date (MM/DD/YYYY): ";
+                    cin.ignore();
+                    getline(cin, date);
+                    cout << "Enter Time Slot (e.g., 10:30 AM): ";
+                    getline(cin, timeSlot);
+
+                    hms.scheduleAppointment(apptId, patId, docId, date, timeSlot);
+                    break;
+                }
+                case 8: {
+                    hms.displayAllAppointments();
+                    break;
+                }
+                case 9: {
+                    hms.displaySystemStatistics();
+                    break;
+                }
+                case 10: {
+                    cout << "\nExiting Hospital Management System.\n";
+                    break;
+                }
+                default: {
+                    cout << "\nInvalid menu choice selected. Please select a valid option between 1 and 10.\n";
+                    break;
+                }
             }
         }
-        catch (exception& e) {
-            cout << "EXCEPTION CAUGHT: " << e.what() << endl;
+        catch (const exception& ex) {
+            cout << "\n\n";
+            cout << " an exception happened: " << ex.what() << endl;
+            cout << "\n";
         }
 
-    } while (choice != 6);
+    } while (menuChoice != 10);
 
     return 0;
 }
