@@ -224,106 +224,188 @@ public:
 
 class HospitalSystem {
 private:
-    // Arrays and Pointers
-    Patient* patients[50];
+    
+    static const int MAX_PATIENTS = 100;
+    static const int MAX_DOCTORS = 50;
+    static const int MAX_APPOINTMENTS = 100;
+
+    Patient* patients[MAX_PATIENTS];
     int patientCount;
 
-    Doctor* doctors[20];
+    Doctor* doctors[MAX_DOCTORS];
     int doctorCount;
 
-    Appointment* appointments[50];
+    Appointment* appointments[MAX_APPOINTMENTS];
     int appointmentCount;
 
-    public:
-    // Constructor initializes counts and adds default doctors
+public:
+    // Constructor to track amount of people. Also adding doctors in myself
     HospitalSystem() {
         patientCount = 0;
         doctorCount = 0;
         appointmentCount = 0;
 
-        // Pre-load a couple of doctors using pointers
-        doctors[doctorCount++] = new Doctor(101, "Judah", "Cardiology");
-        doctors[doctorCount++] = new Doctor(102, "Grace", "Pediatrics");
+        // list of already added doctors
+        doctors[doctorCount++] = new Doctor(101, "Judah", "Cardiology", "Suite 302", 15);
+        doctors[doctorCount++] = new Doctor(102, "Grace", "Physiology", "Suite 405", 10);
+        doctors[doctorCount++] = new Doctor(103, "Matthew", "Morale Support", "Suite 108", 20);
     }
 
-    // Add Patient function with exception handling
-    void addPatient(int id, string name, int age, string diag, double balance) {
-        if (patientCount >= 50) {
-            throw overflow_error("Patient array is full!");
+    
+    // PATIENT MANAGEMENT
+
+    void registerNewPatient(int id, string name, int age, string phone, string addr, string diag, double balance) {
+        // Check capacity limit
+        if (patientCount >= MAX_PATIENTS) {
+            throw overflow_error("Error: Patient database has reached maximum capacity (100 records).");
         }
 
-        // Check for duplicate ID using a loop
+        // Check for duplicate patient IDs using a loop
         for (int i = 0; i < patientCount; i++) {
             if (patients[i]->getId() == id) {
-                throw invalid_argument("A patient with this ID already exists!");
+                throw invalid_argument("Error: A patient with this identification number already exists.");
             }
         }
 
-        patients[patientCount] = new Patient(id, name, age, diag, balance);
+        // add new patient into array
+        patients[patientCount] = new Patient(id, name, age, phone, addr, diag, balance);
         patientCount++;
-        cout << "Patient added successfully!\n";
+        cout << "\nPatient successfully registered in the system database!\n";
     }
 
-// Show all patients using a loop
-    void listPatients() {
+    void displayAllPatients() {
         if (patientCount == 0) {
-            cout << "No patients found in the system\n";
+            cout << "\nNo patient records currently stored in the database.\n";
             return;
         }
-        cout << "\nPATIENT LIST\n";
+
+        cout << "\n\n";
+        cout << "COMPLETE PATIENT DIRECTORY\n";
+        cout << "\n";
+        cout << "Total Registered Patients: " << patientCount << "\n\n";
+
         for (int i = 0; i < patientCount; i++) {
-            patients[i]->display();
+            patients[i]->displayPatientDetails();
         }
     }
 
-    // Show all doctors using a loop
-    void listDoctors() {
-        cout << "\nDOCTOR LIST\n";
-        for (int i = 0; i < doctorCount; i++) {
-            doctors[i]->display();
-        }
-    }
-
-    // Schedule appointment with validation
-    void bookAppointment(int aId, int pId, int dId, string date) {
-        // Verify patient exists using pointer check
-        bool patientFound = false;
+    void searchPatientById(int searchId) {
+        bool found = false;
         for (int i = 0; i < patientCount; i++) {
-            if (patients[i]->getId() == pId) {
-                patientFound = true;
+            if (patients[i]->getId() == searchId) {
+                cout << "\nPatient record located:\n";
+                patients[i]->displayPatientDetails();
+                found = true;
                 break;
             }
         }
-        if (!patientFound) {
-            throw runtime_error("Error: Patient ID not found");
-        }
 
-        // Verify doctor exists
-        bool doctorFound = false;
-        for (int i = 0; i < doctorCount; i++) {
-            if (doctors[i]->getId() == dId) {
-                doctorFound = true;
+        if (!found) {
+            cout << "\nNo patient record matched ID: " << searchId << "\n";
+        }
+    }
+
+    void updatePatientBilling(int targetId, double amountToAdd) {
+        bool found = false;
+        for (int i = 0; i < patientCount; i++) {
+            if (patients[i]->getId() == targetId) {
+                patients[i]->updateBillBalance(amountToAdd);
+                cout << "\nPatient billing balance updated successfully.\n";
+                patients[i]->displayPatientDetails();
+                found = true;
                 break;
             }
         }
-        if (!doctorFound) {
-            throw runtime_error("Error: Doctor ID not found");
-        }
 
-        appointments[appointmentCount] = new Appointment(aId, pId, dId, date);
-        appointmentCount++;
-        cout << "Appointment booked successfully\n";
+        if (!found) {
+            throw runtime_error("Error: Target Patient ID could not be found for billing update.");
+        }
     }
 
-    void listAppointments() {
-        if (appointmentCount == 0) {
-            cout << "No appointments scheduled\n";
-            return;
+
+
+    void displayAllDoctors() {
+        cout << "\n\n";
+        cout << "MEDICAL STAFF DIRECTORY\n";
+        cout << "\n";
+        cout << "Total Active Physicians: " << doctorCount << "\n";
+
+        for (int i = 0; i < doctorCount; i++) {
+            doctors[i]->displayDoctorDetails();
         }
-        cout << "\nAPPOINTMENTS\n";
+    }
+
+    // APPOINTMENT MANAGEMENT
+
+    void scheduleAppointment(int apptId, int patId, int docId, string date, string time) {
+        if (appointmentCount >= MAX_APPOINTMENTS) {
+            throw overflow_error("Error: Appointment schedule buffer is full.");
+        }
+
+        // Verify that the appointment ID is unique
         for (int i = 0; i < appointmentCount; i++) {
-            appointments[i]->display();
+            if (appointments[i]->getAppointmentId() == apptId) {
+                throw invalid_argument("Error: Appointment ID already exists in the system.");
+            }
         }
+
+        // Validate that the Patient exists
+        bool patientExists = false;
+        for (int i = 0; i < patientCount; i++) {
+            if (patients[i]->getId() == patId) {
+                patientExists = true;
+                break;
+            }
+        }
+        if (!patientExists) {
+            throw runtime_error("Error: Patient ID not found. Please register the patient first.");
+        }
+
+        // Validate that the Doctor exists
+        bool doctorExists = false;
+        for (int i = 0; i < doctorCount; i++) {
+            if (doctors[i]->getId() == docId) {
+                doctorExists = true;
+                break;
+            }
+        }
+        if (!doctorExists) {
+            throw runtime_error("Error: Doctor ID not found in the staff directory.");
+        }
+
+        // Create and store the appointment pointer
+        appointments[appointmentCount] = new Appointment(apptId, patId, docId, date, time);
+        appointmentCount++;
+        cout << "\n[SUCCESS] Appointment successfully scheduled and confirmed!\n";
+    }
+
+    void displayAllAppointments() {
+        if (appointmentCount == 0) {
+            cout << "\n[NOTIFICATION] No active appointments currently booked.\n";
+            return;
+        }
+
+        cout << "\n\n";
+        cout << "SCHEDULED APPOINTMENTS LOG\n";
+        cout << "\n";
+        cout << "Total Booked Appointments: " << appointmentCount << "\n\n";
+
+        for (int i = 0; i < appointmentCount; i++) {
+            appointments[i]->displayAppointmentInfo();
+        }
+    }
+
+    // --- HOSPITAL METRICS & STATISTICS ---
+
+    void displaySystemStatistics() {
+        cout << "\n\n";
+        cout << "HOSPITAL SYSTEM STATUS REPORT\n";
+        cout << "\n";
+        cout << " Registered Patients   : " << patientCount << " / " << MAX_PATIENTS << endl;
+        cout << " Active Physicians     : " << doctorCount << " / " << MAX_DOCTORS << endl;
+        cout << " Booked Appointments   : " << appointmentCount << " / " << MAX_APPOINTMENTS << endl;
+        cout << " System Status         : ONLINE & OPERATIONAL" << endl;
+        cout << "\n";
     }
 };
 
