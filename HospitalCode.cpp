@@ -322,6 +322,23 @@ public:
         }
     }
 
+    void registerNewDoctor(int id, string name, string specialization, string room, int experience) {
+        if (doctorCount >= MAX_DOCTORS) {
+            throw overflow_error("Error: Doctor staff directory has reached maximum capacity (50 records).");
+        }
+
+        // Check for duplicate doctor IDs using a standard loop
+        for (int i = 0; i < doctorCount; i++) {
+            if (doctors[i]->getId() == id) {
+                throw invalid_argument("Error: A doctor with this identification number already exists.");
+            }
+        }
+
+        // add new doctor to array
+        doctors[doctorCount] = new Doctor(id, name, specialization, room, experience);
+        doctorCount++;
+        cout << "\nNew doctor successfully added to the medical staff directory!\n";
+    }
 
 
     void displayAllDoctors() {
@@ -335,7 +352,7 @@ public:
         }
     }
 
-    // APPOINTMENT MANAGEMENT
+    // APPOINTMENT MANAGEMENT METHOD
 
     void scheduleAppointment(int apptId, int patId, int docId, string date, string time) {
         if (appointmentCount >= MAX_APPOINTMENTS) {
@@ -373,7 +390,7 @@ public:
             throw runtime_error("Error: Doctor ID not found in the staff directory.");
         }
 
-        // Create and store the appointment pointer
+        // Create appintment
         appointments[appointmentCount] = new Appointment(apptId, patId, docId, date, time);
         appointmentCount++;
         cout << "\n[SUCCESS] Appointment successfully scheduled and confirmed!\n";
@@ -395,7 +412,7 @@ public:
         }
     }
 
-    // --- HOSPITAL METRICS & STATISTICS ---
+    // HOSPITAL STATS
 
     void displaySystemStatistics() {
         cout << "\n\n";
@@ -425,7 +442,7 @@ int main() {
         cout << "6. Exit\n";
         cout << "Enter your choice: ";
 
-        // Basic input check
+        // input check
         if (!(cin >> choice)) {
             cout << "Invalid input. Please enter a number.\n";
             cin.clear();
