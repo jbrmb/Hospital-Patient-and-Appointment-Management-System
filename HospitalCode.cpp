@@ -92,28 +92,65 @@ private:
     int id;
     string name;
     string specialization;
+    string officeRoom;
+    int yearsExperience;
     bool available;
 
 public:
-    // Constructor for creating a doctor
-    Doctor(int dId, string dName, string dSpec) {
+    // Constructor for Doctor class
+    Doctor(int dId, string dName, string dSpec, string dRoom, int dExp) {
+        if (dId <= 0) {
+            throw invalid_argument("Error: Doctor ID must be a positive integer.");
+        }
+
         id = dId;
         name = dName;
         specialization = dSpec;
+        officeRoom = dRoom;
+        yearsExperience = dExp;
         available = true;
     }
 
-    // function to display doctor details
-    void display() {
-        cout << "Doctor ID: " << id << endl;
-        cout << "Name: " << name << endl;
-        cout << "Specialization: " << specialization << endl;
-        cout << "Status: " << (available ? "Available" : "Busy") << endl;
-        cout << "--" << endl;
+    // function to display doctor profile
+    void displayDoctorDetails() {
+        cout << "\n";
+        cout << " Doctor ID    : " << id << endl;
+        cout << " Name         : Dr. " << name << endl;
+        cout << " Speciality   : " << specialization << endl;
+        cout << " Office Room  : " << officeRoom << endl;
+        cout << " Experience   : " << yearsExperience << " years" << endl;
+        cout << " Status       : " << (available ? "Available for Consultation" : "Currently Busy") << endl;
+        cout << "\n";
     }
 
+    // Getters
     int getId() {
         return id;
+    }
+
+    string getName() {
+        return name;
+    }
+
+    string getSpecialization() {
+        return specialization;
+    }
+
+    string getOfficeRoom() {
+        return officeRoom;
+    }
+
+    int getYearsExperience() {
+        return yearsExperience;
+    }
+
+    bool isAvailable() {
+        return available;
+    }
+
+    // Setter for availability status
+    void setAvailability(bool status) {
+        available = status;
     }
 };
 
@@ -122,22 +159,66 @@ private:
     int appointmentId;
     int patientId;
     int doctorId;
-    string date;
+    string appointmentDate;
+    string timeSlot;
+    string consultationStatus;
 
 public:
-    // Constructor
-    Appointment(int aId, int pId, int dId, string aDate) {
+    // Constructor for Appointment class
+    Appointment(int aId, int pId, int dId, string aDate, string aTime) {
+        if (aId <= 0) {
+            throw invalid_argument("Error: Appointment ID must be greater than zero.");
+        }
+
         appointmentId = aId;
         patientId = pId;
         doctorId = dId;
-        date = aDate;
+        appointmentDate = aDate;
+        timeSlot = aTime;
+        consultationStatus = "Scheduled";
     }
 
-    void display() {
-        cout << "Appointment ID: " << appointmentId 
-             << " | Patient ID: " << patientId 
-             << " | Doctor ID: " << doctorId 
-             << " | Date: " << date << endl;
+    //  function to display appointment record
+    void displayAppointmentInfo() {
+        cout << "\n";
+        cout << " APPOINTMENT #" << appointmentId << endl;
+        cout << "\n";
+        cout << " Patient ID   : " << patientId << endl;
+        cout << " Doctor ID    : " << doctorId << endl;
+        cout << " Date         : " << appointmentDate << endl;
+        cout << " Time Slot    : " << timeSlot << endl;
+        cout << " Status       : " << consultationStatus << endl;
+        cout << "\n";
+    }
+
+    // Getters
+    int getAppointmentId() {
+        return appointmentId;
+    }
+
+    int getPatientId() {
+        return patientId;
+    }
+
+    int getDoctorId() {
+        return doctorId;
+    }
+
+    string getAppointmentDate() {
+        return appointmentDate;
+    }
+
+    string getTimeSlot() {
+        return timeSlot;
+    }
+
+    string getConsultationStatus() {
+        return consultationStatus;
+    }
+
+    // Setter for status update
+    void setConsultationStatus(string status) {
+        consultationStatus = status;
     }
 };
 
