@@ -1,82 +1,73 @@
 #include <iostream>
 #include <string>
 #include <stdexcept>
-#include <iomanip>
 
 using namespace std;
 
-// PERSON CLASS
-class Person {
-protected:
+class Patient {
+private:
     int id;
     string name;
     int age;
-
-public:
-    // Constructor that checks for reasonable person age
-    Person(int personId, string personName, int personAge) {
-        if (personId <= 0 || personAge < 0 || personAge > 120) {
-            throw invalid_argument("Error: Invalid ID or age range provided.");
-        }
-        id = personId;
-        name = personName;
-        age = personAge;
-    }
-
-    // Get the ID of the person
-    int getId() const { return id; }
-    // Get the name of the person
-    string getName() const { return name; }
-    // Get the age of the person
-    int getAge() const { return age; }
-};
-// PATIENT CLASS
-class Patient : public Person {
-private:
     string diagnosis;
-    double balanceDue;
+    double billBalance;
 
 public:
-    Patient(int pId, string pName, int pAge, string pDiagnosis, double pBalance)
-        : Person(pId, pName, pAge), diagnosis(pDiagnosis), balanceDue(pBalance) {}
-
-    // Standard non-virtual display function for patients
-    void displayPatient() const {
-        cout << "[Patient] ID: " << setw(5) << id 
-             << " | Name: " << setw(15) << left << name 
-             << " | Age: " << setw(3) << age 
-             << " | Diagnosis: " << setw(15) << diagnosis 
-             << " | Balance: $" << fixed << setprecision(2) << balanceDue << endl;
+    // Constructor
+    Patient(int pId, string pName, int pAge, string pDiag, double pBalance) {
+        if (pId <= 0 || pAge < 0) {
+            throw invalid_argument("Invalid ID or age entered for patient");
+        }
+        id = pId;
+        name = pName;
+        age = pAge;
+        diagnosis = pDiag;
+        billBalance = pBalance;
     }
 
-    double getBalance() const { return balanceDue; }
-    void updateBalance(double amount) {
-        balanceDue += amount;
-        if (balanceDue < 0) balanceDue = 0;
+// function to display patient details
+    void display() {
+        cout << "Patient ID: " << id << endl;
+        cout << "Name: " << name << endl;
+        cout << "Age: " << age << endl;
+        cout << "Diagnosis: " << diagnosis << endl;
+        cout << "Bill Balance: $" << billBalance << endl;
+        cout << "--" << endl;
     }
-    string getDiagnosis() const { return diagnosis; }
+
+    int getId() {
+        return id;
+    }
 };
 
-class Doctor : public Person {
+class Doctor {
 private:
+    int id;
+    string name;
     string specialization;
-    bool isAvailable;
+    bool available;
 
 public:
-    Doctor(int dId, string dName, int dAge, string dSpec)
-        : Person(dId, dName, dAge), specialization(dSpec), isAvailable(true) {}
-
-    // Standard non-virtual display function for doctors
-    void displayDoctor() const {
-        cout << "[Doctor]  ID: " << setw(5) << id 
-             << " | Dr. " << setw(13) << left << name 
-             << " | Spec: " << setw(15) << specialization 
-             << " | Status: " << (isAvailable ? "Available" : "Busy") << endl;
+    // Constructor for creating a doctor
+    Doctor(int dId, string dName, string dSpec) {
+        id = dId;
+        name = dName;
+        specialization = dSpec;
+        available = true;
     }
 
-    bool getAvailability() const { return isAvailable; }
-    void setAvailability(bool status) { isAvailable = status; }
-    string getSpecialization() const { return specialization; }
+    // function to display doctor details
+    void display() {
+        cout << "Doctor ID: " << id << endl;
+        cout << "Name: " << name << endl;
+        cout << "Specialization: " << specialization << endl;
+        cout << "Status: " << (available ? "Available" : "Busy") << endl;
+        cout << "--" << endl;
+    }
+
+    int getId() {
+        return id;
+    }
 };
 
 class Appointment {
@@ -87,14 +78,105 @@ private:
     string date;
 
 public:
-    Appointment(int apptId, int patId, int docId, string apptDate)
-        : appointmentId(apptId), patientId(patId), doctorId(docId), date(apptDate) {}
-
-    void displayAppointment() const {
-        cout << "[Appointment #" << appointmentId << "] Patient ID: " << patientId 
-             << " scheduled with Doctor ID: " << doctorId 
-             << " on Date: " << date << endl;
+    // Constructor
+    Appointment(int aId, int pId, int dId, string aDate) {
+        appointmentId = aId;
+        patientId = pId;
+        doctorId = dId;
+        date = aDate;
     }
 
-    int getAppointmentId() const { return appointmentId; }
+    void display() {
+        cout << "Appointment ID: " << appointmentId 
+             << " | Patient ID: " << patientId 
+             << " | Doctor ID: " << doctorId 
+             << " | Date: " << date << endl;
+    }
+};
+
+class HospitalSystem {
+private:
+    // Arrays and Pointers
+    Patient* patients[50];
+    int patientCount;
+
+    Doctor* doctors[20];
+    int doctorCount;
+
+    Appointment* appointments[50];
+    int appointmentCount;
+
+    public:
+    // Constructor initializes counts and adds default doctors
+    HospitalSystem() {
+        patientCount = 0;
+        doctorCount = 0;
+        appointmentCount = 0;
+
+        // Pre-load a couple of doctors using pointers
+        doctors[doctorCount++] = new Doctor(101, "Judah", "Cardiology");
+        doctors[doctorCount++] = new Doctor(102, "Grace", "Pediatrics");
+    }
+
+// Show all patients using a loop
+    void listPatients() {
+        if (patientCount == 0) {
+            cout << "No patients found in the system\n";
+            return;
+        }
+        cout << "\nPATIENT LIST\n";
+        for (int i = 0; i < patientCount; i++) {
+            patients[i]->display();
+        }
+    }
+
+    // Show all doctors using a loop
+    void listDoctors() {
+        cout << "\nDOCTOR LIST\n";
+        for (int i = 0; i < doctorCount; i++) {
+            doctors[i]->display();
+        }
+    }
+
+    // Schedule appointment with validation
+    void bookAppointment(int aId, int pId, int dId, string date) {
+        // Verify patient exists using pointer check
+        bool patientFound = false;
+        for (int i = 0; i < patientCount; i++) {
+            if (patients[i]->getId() == pId) {
+                patientFound = true;
+                break;
+            }
+        }
+        if (!patientFound) {
+            throw runtime_error("Error: Patient ID not found");
+        }
+
+        // Verify doctor exists
+        bool doctorFound = false;
+        for (int i = 0; i < doctorCount; i++) {
+            if (doctors[i]->getId() == dId) {
+                doctorFound = true;
+                break;
+            }
+        }
+        if (!doctorFound) {
+            throw runtime_error("Error: Doctor ID not found");
+        }
+
+        appointments[appointmentCount] = new Appointment(aId, pId, dId, date);
+        appointmentCount++;
+        cout << "Appointment booked successfully\n";
+    }
+
+    void listAppointments() {
+        if (appointmentCount == 0) {
+            cout << "No appointments scheduled\n";
+            return;
+        }
+        cout << "\nAPPOINTMENTS\n";
+        for (int i = 0; i < appointmentCount; i++) {
+            appointments[i]->display();
+        }
+    }
 };
